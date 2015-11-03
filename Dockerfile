@@ -1,10 +1,14 @@
-FROM busybox:ubuntu-14.04
+FROM alpine:3.2
 MAINTAINER Werner Beroux <werner@beroux.com>
 
 # Install ngrok
-ADD https://dl.ngrok.com/ngrok_2.0.19_linux_amd64.zip /ngrok.zip
-RUN unzip -o ngrok.zip -d /bin && \
-    rm -f ngrok.zip
+RUN apk add --update openssl \
+    && wget https://dl.ngrok.com/ngrok_2.0.19_linux_amd64.zip -O /ngrok.zip \
+    && unzip -o ngrok.zip -d /bin \
+    && rm -f ngrok.zip \
+    && apk del --purge openssl \
+    && rm -rf /var/cache/apk/*
+# TODO: Currently failing because it seems to need some extra files.
 
 # Add config script
 COPY ngrok.yml /home/ngrok/.ngrok2/
