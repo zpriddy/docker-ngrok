@@ -21,6 +21,9 @@ ARGS="ngrok"
 # Set the protocol.
 if [ "$NGROK_PROTOCOL" = "TCP" ]; then
   ARGS="$ARGS tcp"
+elif [ "$NGROK_PROTOCOL" = "TLS" ]; then
+    ARGS="$ARGS tls "
+    NGROK_PORT="${NGROK_PORT:-80}"
 else
   ARGS="$ARGS http"
   NGROK_PORT="${NGROK_PORT:-80}"
@@ -32,8 +35,13 @@ if [ -n "$NGROK_CERT" ] && [ -n "$NGROK_KEY" ]; then
 fi
 
 # User lets encrypt cert and key if passed in
-if [ -n "$NGROK_HOSTNAME" ] && [ -n "$LETS_ENCRYPT" ]; then
-    ARGS="$ARGS -key=$LETS_ENCRYPT/$NGROK_HOSTNAME/privkey.pem -crt=$LETS_ENCRYPT/$NGROK_HOSTNAME/cert.pem "
+if [ -n "$URL" ] && [ -n "$LETS_ENCRYPT" ]; then
+    if [ -f "$LETS_ENCRYPT/etc/letsencrypt/live/$URL/privkey.pem" ] && [ -f "$LETS_ENCRYPT/etc/letsencrypt/live/$URL/cert.pem" ]; then
+        ARGS="$ARGS -key=$LETS_ENCRYPT/etc/letsencrypt/live/$URL/privkey.pem -crt=$LETS_ENCRYPT/etc/letsencrypt/live/$URL/cert.pem -hostname=$URL "
+    else
+        echo "Missing lets encrypt cert or key. Using standard cert. Restart after getting new cert."
+        ARGS="$ARGS -hostname=$URL "
+    fi
 fi
 
 # Set the TLS binding flag

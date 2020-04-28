@@ -31,4 +31,6 @@ ENV USER=ngrok
 
 EXPOSE 4040
 
+RUN ngrok --version
+RUN ls -lah /bin/ngrok
 CMD ["/entrypoint.sh"]
