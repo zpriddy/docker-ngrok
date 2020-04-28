@@ -26,6 +26,16 @@ else
   NGROK_PORT="${NGROK_PORT:-80}"
 fi
 
+# Set the key and cert if passed in
+if [ -n "$NGROK_CERT" ] && [ -n "$NGROK_KEY" ]; then
+    ARGS="$ARGS -key=$NGROK_KEY -crt=$NGROK_CERT "
+fi
+
+# User lets encrypt cert and key if passed in
+if [ -n "$NGROK_HOSTNAME" ] && [ -n "$LETS_ENCRYPT" ]; then
+    ARGS="$ARGS -key=$LETS_ENCRYPT/$NGROK_HOSTNAME/privkey.pem -crt=$LETS_ENCRYPT/$NGROK_HOSTNAME/cert.pem "
+fi
+
 # Set the TLS binding flag
 if [ -n "$NGROK_BINDTLS" ]; then
   ARGS="$ARGS -bind-tls=$NGROK_BINDTLS "
